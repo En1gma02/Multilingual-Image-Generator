@@ -49,7 +49,7 @@ def transcribe_speech():
 
 
 def main():
-    st.title("Text to Image Generation")
+    st.title("Multilingual Image Generation")
 
     # Get all available languages supported by Google Translate
     available_languages = list(LANGUAGES.values())
