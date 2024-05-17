@@ -63,6 +63,7 @@ def transcribe_speech_from_audio_file(uploaded_file):
     r = sr.Recognizer()
 
     try:
+        st.write("Reading uploaded file...")
         audio = sr.AudioFile(uploaded_file)
         with audio as source:
             audio_data = r.record(source)
