@@ -29,6 +29,7 @@ def generate_images_from_text(text, num_images=1, base_iteration=0.1):
             image = Image.open(BytesIO(image_bytes))
             images.append(image)
         else:
+            st.error(f"Failed to generate image {i + 1}. HTTP status code: {response.status_code}")
             return None
 
     return images
@@ -113,6 +114,7 @@ def main():
             uploaded_file = st.file_uploader("Upload audio file", type=['wav', 'mp3'])
             if uploaded_file is not None:
                 # Attempt speech transcription from uploaded audio file
+                st.write(f"Uploaded file name: {uploaded_file.name}")
                 speech_text = transcribe_speech_from_audio_file(uploaded_file)
 
         if speech_text:
@@ -124,6 +126,8 @@ def main():
                     st.image(image, caption=f"Generated Image {i + 1}", use_column_width=True)
             else:
                 st.error("Failed to generate images. Please try again.")
+        else:
+            st.error("Speech transcription failed. Please try again.")
 
 
 if __name__ == "__main__":
