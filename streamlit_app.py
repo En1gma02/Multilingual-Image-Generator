@@ -34,8 +34,8 @@ def generate_images_from_text(text, num_images=1, base_iteration=0.1):
     return images
 
 
-# Function to transcribe speech input
-def transcribe_speech():
+# Function to transcribe speech input from microphone
+def transcribe_speech_from_microphone():
     r = sr.Recognizer()
 
     try:
@@ -55,6 +55,22 @@ def transcribe_speech():
                 return None
     except OSError as e:
         st.error(f"Microphone not accessible: {e}")
+        return None
+
+
+# Function to transcribe speech input from uploaded audio file
+def transcribe_speech_from_audio_file(uploaded_file):
+    r = sr.Recognizer()
+
+    try:
+        audio = sr.AudioFile(uploaded_file)
+        with audio as source:
+            audio_data = r.record(source)
+            text = r.recognize_google(audio_data)
+            st.write("Transcribed audio:", text)
+            return text
+    except Exception as e:
+        st.error(f"Error transcribing audio file: {e}")
         return None
 
 
@@ -88,7 +104,16 @@ def main():
 
     # Speech input
     if st.button("Generate Image from Speech"):
-        speech_text = transcribe_speech()
+        # Attempt speech transcription from microphone
+        speech_text = transcribe_speech_from_microphone()
+
+        if speech_text is None:
+            # If microphone not accessible, allow user to upload an audio file
+            uploaded_file = st.file_uploader("Upload audio file", type=['wav', 'mp3'])
+            if uploaded_file is not None:
+                # Attempt speech transcription from uploaded audio file
+                speech_text = transcribe_speech_from_audio_file(uploaded_file)
+
         if speech_text:
             translated_text = translate_text(speech_text, "en", target_lang)
             images = generate_images_from_text(translated_text, num_images=num_images)
