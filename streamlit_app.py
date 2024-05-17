@@ -38,21 +38,21 @@ def generate_images_from_text(text, num_images=1, base_iteration=0.1):
 def transcribe_speech():
     r = sr.Recognizer()
 
-    with sr.Microphone() as source:
-        st.write("Listening...")
-        r.adjust_for_ambient_noise(source, duration=0.5)
-        audio = r.listen(source, timeout=10)  # Adjust timeout value as needed
-        try:
-            text = r.recognize_google(audio)
-            st.write("You said:", text)
-            return text
-        except sr.UnknownValueError:
-            st.write("Sorry, I didn't catch that. Please try again.")
-            return None
-        except sr.RequestError as e:
-            st.error(f"Could not request results; {e}")
-            return None
-    
+    try:
+        with sr.Microphone() as source:
+            st.write("Listening...")
+            r.adjust_for_ambient_noise(source, duration=0.5)
+            audio = r.listen(source, timeout=10)  # Adjust timeout value as needed
+            try:
+                text = r.recognize_google(audio)
+                st.write("You said:", text)
+                return text
+            except sr.UnknownValueError:
+                st.write("Sorry, I didn't catch that. Please try again.")
+                return None
+            except sr.RequestError as e:
+                st.error(f"Could not request results; {e}")
+                return None
     except OSError as e:
         st.error(f"Microphone not accessible: {e}")
         return None
