@@ -52,6 +52,10 @@ def transcribe_speech():
         except sr.RequestError as e:
             st.error(f"Could not request results; {e}")
             return None
+    
+    except OSError as e:
+        st.error(f"Microphone not accessible: {e}")
+        return None
 
 
 def main():
