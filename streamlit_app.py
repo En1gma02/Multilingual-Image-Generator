@@ -77,7 +77,7 @@ def main():
 
     # Speech input
     st.button("Generate Images from Speech")
-    audio_bytes = audio_recorder(text="Record your prompt:", icon_size="2x")
+    audio_bytes = audio_recorder(text="Tap on the mic to start recording:", icon_size="2x")
 
     if audio_bytes:
         file_name = "speech_recorded.wav"
