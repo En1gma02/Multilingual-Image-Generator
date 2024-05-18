@@ -3,8 +3,8 @@ from PIL import Image
 import requests
 from io import BytesIO
 from googletrans import LANGUAGES, Translator
-import speech_recognition as sr
-
+from audio_recorder_streamlit import audio_recorder
+import os
 
 # Function to translate text
 def translate_text(text, source_lang, target_lang):
@@ -12,10 +12,8 @@ def translate_text(text, source_lang, target_lang):
     translated_text = translator.translate(text, src=source_lang, dest=target_lang)
     return translated_text.text
 
-
 # Function to generate image from text
 def generate_images_from_text(text, num_images=1, base_iteration=0.1):
-    # Use the text-to-image model to generate the image
     API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
     headers = {"Authorization": "Bearer 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"}
 
@@ -34,39 +32,13 @@ def generate_images_from_text(text, num_images=1, base_iteration=0.1):
 
     return images
 
+# Function to transcribe speech input from audio file using Google Speech Recognition API
+def transcribe_speech_from_audio_file(audio_file_path):
+    import speech_recognition as sr
 
-# Function to transcribe speech input from microphone
-def transcribe_speech_from_microphone():
     r = sr.Recognizer()
-
     try:
-        with sr.Microphone() as source:
-            st.write("Listening...")
-            r.adjust_for_ambient_noise(source, duration=0.5)
-            audio = r.listen(source, timeout=10)  # Adjust timeout value as needed
-            try:
-                text = r.recognize_google(audio)
-                st.write("You said:", text)
-                return text
-            except sr.UnknownValueError:
-                st.write("Sorry, I didn't catch that. Please try again.")
-                return None
-            except sr.RequestError as e:
-                st.error(f"Could not request results; {e}")
-                return None
-    except OSError as e:
-        st.error(f"Microphone not accessible: {e}")
-        return None
-
-
-# Function to transcribe speech input from uploaded audio file
-def transcribe_speech_from_audio_file(uploaded_file):
-    r = sr.Recognizer()
-
-    try:
-        st.write("Reading uploaded file...")
-        audio = sr.AudioFile(uploaded_file)
-        with audio as source:
+        with sr.AudioFile(audio_file_path) as source:
             audio_data = r.record(source)
             text = r.recognize_google(audio_data)
             st.write("Transcribed audio:", text)
@@ -74,7 +46,6 @@ def transcribe_speech_from_audio_file(uploaded_file):
     except Exception as e:
         st.error(f"Error transcribing audio file: {e}")
         return None
-
 
 def main():
     st.title("Multilingual Image Generation Using Text & Speech")
@@ -105,20 +76,19 @@ def main():
                 st.error("Failed to generate images. Please try again.")
 
     # Speech input
-    if st.button("Generate Image from Speech"):
-        # Attempt speech transcription from microphone
-        speech_text = transcribe_speech_from_microphone()
+    st.subheader("Or Record Your Speech")
+    audio_bytes = audio_recorder(text="Record your question", icon_size="2x")
 
-        if speech_text is None:
-            # If microphone not accessible, allow user to upload an audio file
-            uploaded_file = st.file_uploader("Upload audio file", type=['wav', 'mp3'])
-            if uploaded_file is not None:
-                # Attempt speech transcription from uploaded audio file
-                st.write(f"Uploaded file name: {uploaded_file.name}")
-                speech_text = transcribe_speech_from_audio_file(uploaded_file)
+    if audio_bytes:
+        file_name = "speech_recorded.wav"
+        with open(file_name, "wb") as audio_file:
+            audio_file.write(audio_bytes)
+
+        speech_text = transcribe_speech_from_audio_file(file_name)
+        os.remove(file_name)
 
         if speech_text:
-            translated_text = translate_text(speech_text, "en", target_lang)
+            translated_text = translate_text(speech_text, source_lang, target_lang)
             images = generate_images_from_text(translated_text, num_images=num_images)
             if images:
                 st.write(f"English Translated Prompt: ", translated_text)
