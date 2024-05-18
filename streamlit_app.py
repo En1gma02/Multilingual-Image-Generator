@@ -76,8 +76,8 @@ def main():
                 st.error("Failed to generate images. Please try again.")
 
     # Speech input
-    st.subheader("Or Record Your Speech")
-    audio_bytes = audio_recorder(text="Record your question", icon_size="2x")
+    st.button("Generate Images from Speech")
+    audio_bytes = audio_recorder(text="Record your prompt:", icon_size="2x")
 
     if audio_bytes:
         file_name = "speech_recorded.wav"
