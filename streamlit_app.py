@@ -99,11 +99,5 @@ def main():
         else:
             st.error("Speech transcription failed. Please try again.")
 
-    # Add creator details and socials
-    st.markdown("---")
-    st.write("Created by, Akshansh Dwivedi")
-    st.write("[GitHub](https://github.com/En1gma02)")
-    st.write("[LinkedIn](https://www.linkedin.com/in/akshansh2624)")
-
 if __name__ == "__main__":
     main()
