@@ -3,8 +3,8 @@ from PIL import Image
 import requests
 from io import BytesIO
 from googletrans import LANGUAGES, Translator
-import speech_recognition as sr
 from audio_recorder_streamlit import audio_recorder
+import speech_recognition as sr
 
 # Function to translate text
 def translate_text(text, source_lang, target_lang):
@@ -55,17 +55,16 @@ def main():
     source_lang = st.sidebar.selectbox("Select Source Language", available_languages)
     target_lang = "en"
 
-    col1, col2 = st.columns([0.8, 0.2])
+    col1, col2 = st.columns([0.85, 0.15])
 
     with col1:
-        text_input = st.text_area("Enter text in the source language")
+        text_input = st.text_area("Enter text in the source language", key="text_input")
     with col2:
-        audio_bytes = audio_recorder(text="Or Record Your Speech", icon_size="2x")
-
+        audio_bytes = audio_recorder(icon_size="2x")
         if audio_bytes:
             transcribed_text = transcribe_speech_from_microphone(audio_bytes)
             if transcribed_text:
-                text_input = transcribed_text
+                st.session_state.text_input = transcribed_text
                 st.experimental_rerun()
 
     num_images = st.number_input("Number of Images to Generate", min_value=1, max_value=10, value=1, step=1)
